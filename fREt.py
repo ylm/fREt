@@ -56,7 +56,10 @@ def main():
     parser.add_argument('file', nargs='?',
                        help='File to edit')
     args = parser.parse_args()
-    device_layout = load_xdlrc(args.file)
+    if args.file:
+        device_layout = xdlrc_parser.load_xdlrc(args.file)
+    else:
+        device_layout = None
     curses.wrapper(main_window, device_layout)
     
     
@@ -65,26 +68,39 @@ def main_window(stdscr, device_layout):
     stdscr.clear()
     cursor_posx = 0
     cursor_posy = 0
-    wrkpad = curses.newpad(device_layout.tile_rows*2 - 1, device_layout.tile_cols*2 - 1)
-    for irow in range(0, device_layout.tile_rows):
-        for icol in range(0, device_layout.tile_cols):
-            itile = device_layout.tile_list[irow*device_layout.tile_cols + icol]
-            wrkpad.addstr(irow*2, icol*2, itile[4][0]+' ')
-    while True:
-        wrkpad.refresh()
+    if device_layout:
+        wrkpad = curses.newpad(device_layout.tile_rows*2, device_layout.tile_cols*2)
+        for irow in range(0, device_layout.tile_rows):
+            for icol in range(0, device_layout.tile_cols):
+                itile = device_layout.tile_list[irow*device_layout.tile_cols + icol]
+                wrkpad.addstr(irow*2, icol*2, itile[4]._val[0]+' ')
+        while True:
+            stdscr.move(cursor_posy+1, cursor_posx+1)
+            wrkpad.refresh(cursor_posy, cursor_posx, 1, 1, 30, 120)
+            curses.curs_set(1)
+            stdscr.refresh()
+            c_key = stdscr.getkey()
 
-        if c_key == 'q':
-            break
-        elif c_key == 'h':
-        elif c_key == 'j':
-        elif c_key == 'k':
-        elif c_key == 'l':
-        elif c_key == 'y':
-        elif c_key == 'u':
-        elif c_key == 'b':
-        elif c_key == 'n':
-        else:
-            pass
+            if c_key == 'q':
+                break
+            elif c_key == 'h':
+                pass
+            elif c_key == 'j':
+                pass
+            elif c_key == 'k':
+                pass
+            elif c_key == 'l':
+                pass
+            elif c_key == 'y':
+                pass
+            elif c_key == 'u':
+                pass
+            elif c_key == 'b':
+                pass
+            elif c_key == 'n':
+                pass
+            else:
+                pass
 
 
 def manage_tile_dictionary(device_layout):
